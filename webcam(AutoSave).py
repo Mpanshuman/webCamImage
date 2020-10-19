@@ -13,19 +13,19 @@ def image_collect(frame):
     
     for (x,y,w,h) in faces:
         
-        cv.rectangle(frame,(x,y),(x+w,y+h),(0,255,255),2)
+        # cv.rectangle(frame,(x,y),(x+w,y+h),(0,255,255),2)
         cropped_face = frame[y:y+h,x:x+w]
 
     return cropped_face
 
-# Saves Image in train and test folder
+# Save image in different directory
 
 def save_image(counter , image):
 
     if counter <= 50:
-        os.chdir(train_img)
+        os.chdir(train_label_dir)
     else:
-        os.chdir(test_img)
+        os.chdir(test_label_dir)
       
     
     cv.imwrite(f'{counter}.png',image)
@@ -39,22 +39,29 @@ webcam.set(10, 100) # set brightness
 counter = 0
 
 ## path for saving file
+# Path : Dataset -> Train -> Users_Named_Folder(Labels)
+# Path : Dataset -> Test -> Users_Named_Folder(Labels)
 
-parent_dir = r"C:\Users\Anshuman\Desktop\sambhu_opencv"
+parent_dir = r"C:\Users\Anshuman\Desktop\openCvProject"
 Img_directory = 'Anshuman'
-save_img_path = os.path.join(parent_dir,Img_directory)
+Main_dir = "Dataset"
+save_img_path = os.path.join(parent_dir,Main_dir)
 train_dir = 'Train'
 test_dir = 'Test'
 train_img = os.path.join(save_img_path,train_dir)
 test_img = os.path.join(save_img_path,test_dir)
+train_label_dir = os.path.join(train_img,Img_directory)
+test_label_dir = os.path.join(test_img,Img_directory)
 
 try:
     os.mkdir(save_img_path)
     os.mkdir(train_img)
     os.mkdir(test_img)
+    os.mkdir(train_label_dir)
+    os.mkdir(test_label_dir)
 
 except OSError as error:
-    print(error)
+    print("User Folder Exists")
 
 
 faceCascade = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
@@ -64,8 +71,7 @@ while webcam.isOpened():
     flag,frame = webcam.read()
     cv.imshow('MainVideo',frame)
     
-    # If face is detected and cropped image is returned
-
+    
     if image_collect(frame) is not None:
         faces = image_collect(frame)
                 
@@ -84,8 +90,6 @@ while webcam.isOpened():
     else:
         print('Face not found')                 
     
-    # press 'Q' to quite or webcam is closed after 100 picture is taken
-
     if cv.waitKey(1) == ord('q') or counter == 100:
         break
   
